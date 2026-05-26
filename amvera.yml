@@ -1,10 +1,10 @@
+name: Test-chinese
+tariffId: "5"
 meta:
-  name: Test_chinese
-  version: 1.0.0
-  toolchain: python              # <--- это поле было обязательно
+  toolchain: python
 build:
   language: python
-  python: "3.11.9"                 # явно укажите версию
+  python_version: "3.11"
   requirements: requirements.txt
 run:
   command: python bot.py
