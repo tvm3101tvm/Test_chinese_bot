@@ -1,11 +1,13 @@
 meta:
-  name: chinese-quest-bot
+  name: Test_chinese
   version: 1.0.0
+  toolchain: python              # <--- это поле было обязательно
 build:
   language: python
+  python: "3.11.9"                 # явно укажите версию
   requirements: requirements.txt
 run:
-  command: ls -la && python bot.py
+  command: python bot.py
   persistenceMount: /data
-  environment:
-    - BOT_TOKEN
+environment:
+  - BOT_TOKEN
