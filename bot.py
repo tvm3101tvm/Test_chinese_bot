@@ -451,19 +451,17 @@ async def voice_handler(callback_query: types.CallbackQuery):
     save_voice_state(voice_state)
     await bot.answer_callback_query(callback_query.id)
 
-# ---------- ВРЕМЕННЫЙ ОБРАБОТЧИК ДЛЯ ПОЛУЧЕНИЯ FILE_ID ----------
-# Раскомментируйте для получения file_id GIF и голосовых/аудио
-# @dp.message_handler(content_types=['animation', 'voice', 'audio'])
-# async def get_file_id_handler(message: types.Message):
-#     if message.animation:
-#         file_id = message.animation.file_id
-#         await message.reply(f"GIF file_id:\n`{file_id}`")
-#     elif message.voice:
-#         file_id = message.voice.file_id
-#         await message.reply(f"Voice message file_id:\n`{file_id}`")
-#     elif message.audio:
-#         file_id = message.audio.file_id
-#         await message.reply(f"Audio file (MP3/M4A) file_id:\n`{file_id}`")
+@dp.message_handler(content_types=['animation', 'voice', 'audio'])
+async def get_file_id_handler(message: types.Message):
+    if message.animation:
+        file_id = message.animation.file_id
+        await message.reply(f"GIF file_id:\n`{file_id}`")
+    elif message.voice:
+        file_id = message.voice.file_id
+        await message.reply(f"Voice message file_id:\n`{file_id}`")
+    elif message.audio:
+        file_id = message.audio.file_id
+        await message.reply(f"Audio file (MP3/M4A) file_id:\n`{file_id}`")
 
 # ---------- ЗАПУСК ----------
 async def on_startup(dp):
