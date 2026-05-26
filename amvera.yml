@@ -5,7 +5,7 @@ build:
   language: python
   requirements: requirements.txt
 run:
-  command: python bot.py
+  command: ls -la && python bot.py
   persistenceMount: /data
   environment:
     - BOT_TOKEN
