@@ -517,8 +517,8 @@ async def get_file_id_handler(message: types.Message):
         await message.reply(f"GIF file_id:\n`{file_id}`")
     elif message.voice:
         file_id = message.voice.file_id
-        await message.reply(f"Audio file_id:\n`{file_id}`")
-        
+        await message.reply(f"Voice file_id:\n`{file_id}`")
+
 # ---------- ЗАПУСК ----------
 async def on_startup(dp):
     await bot.delete_webhook(drop_pending_updates=True)
