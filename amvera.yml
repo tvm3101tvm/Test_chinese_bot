@@ -1,0 +1,11 @@
+meta:
+  name: chinese-quest-bot
+  version: 1.0.0
+build:
+  language: python
+  requirements: requirements.txt
+run:
+  command: python bot.py
+  persistenceMount: /data
+  environment:
+    - BOT_TOKEN
