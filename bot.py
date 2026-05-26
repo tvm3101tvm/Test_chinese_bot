@@ -18,79 +18,79 @@ dp = Dispatcher(bot)
 dp.middleware.setup(LoggingMiddleware())
 
 # ======================= БАЗА ГРАФЕМ (71 иероглиф) =======================
-# У каждого: char, pinyin, meaning, gif (file_id), audio (file_id)
+# У каждого: char, pinyin, meaning, gif (file_id), voice (file_id)
 graphemes = {
-    1: {'char': '人', 'pinyin': 'rén', 'meaning': 'человек', 'gif': None, 'audio': None},
-    2: {'char': '大', 'pinyin': 'dà', 'meaning': 'большой', 'gif': None, 'audio': None},
-    3: {'char': '天', 'pinyin': 'tiān', 'meaning': 'небо', 'gif': None, 'audio': None},
-    4: {'char': '口', 'pinyin': 'kǒu', 'meaning': 'рот', 'gif': None, 'audio': None},
-    5: {'char': '日', 'pinyin': 'rì', 'meaning': 'солнце', 'gif': None, 'audio': None},
-    6: {'char': '目', 'pinyin': 'mù', 'meaning': 'глаз', 'gif': None, 'audio': None},
-    7: {'char': '田', 'pinyin': 'tián', 'meaning': 'поле', 'gif': None, 'audio': None},
-    8: {'char': '月', 'pinyin': 'yuè', 'meaning': 'месяц', 'gif': None, 'audio': None},
-    9: {'char': '木', 'pinyin': 'mù', 'meaning': 'дерево', 'gif': None, 'audio': None},
-    10: {'char': '女', 'pinyin': 'nǚ', 'meaning': 'женщина', 'gif': None, 'audio': None},
-    11: {'char': '马', 'pinyin': 'mǎ', 'meaning': 'лошадь', 'gif': None, 'audio': None},
-    12: {'char': '儿', 'pinyin': 'ér', 'meaning': 'идущий человек', 'gif': None, 'audio': None},
-    13: {'char': '父', 'pinyin': 'fù', 'meaning': 'отец', 'gif': None, 'audio': None},
-    14: {'char': '母', 'pinyin': 'mǔ', 'meaning': 'мать', 'gif': None, 'audio': None},
-    15: {'char': '门', 'pinyin': 'mén', 'meaning': 'дверь', 'gif': None, 'audio': None},
-    16: {'char': '刀', 'pinyin': 'dāo', 'meaning': 'нож', 'gif': None, 'audio': None},
-    17: {'char': 'ヒ', 'pinyin': 'bǐ', 'meaning': 'черпак, кинжал', 'gif': None, 'audio': None},
-    18: {'char': '米', 'pinyin': 'mǐ', 'meaning': 'рис', 'gif': None, 'audio': None},
-    19: {'char': '水', 'pinyin': 'shuǐ', 'meaning': 'вода', 'gif': None, 'audio': None},
-    20: {'char': '火', 'pinyin': 'huǒ', 'meaning': 'огонь', 'gif': None, 'audio': None},
-    21: {'char': '毛', 'pinyin': 'máo', 'meaning': 'шерсть', 'gif': None, 'audio': None},
-    22: {'char': '手', 'pinyin': 'shǒu', 'meaning': 'рука', 'gif': None, 'audio': None},
-    23: {'char': '又', 'pinyin': 'yòu', 'meaning': 'ладонь правой руки', 'gif': None, 'audio': None},
-    24: {'char': '足', 'pinyin': 'zú', 'meaning': 'нога, ступня', 'gif': None, 'audio': None},
-    25: {'char': '走', 'pinyin': 'zǒu', 'meaning': 'идти', 'gif': None, 'audio': None},
-    26: {'char': '行', 'pinyin': 'xíng', 'meaning': 'движение', 'gif': None, 'audio': None},
-    27: {'char': '舌', 'pinyin': 'shé', 'meaning': 'язык', 'gif': None, 'audio': None},
-    28: {'char': '言', 'pinyin': 'yán', 'meaning': 'речь', 'gif': None, 'audio': None},
-    29: {'char': '立', 'pinyin': 'lì', 'meaning': 'стоять', 'gif': None, 'audio': None},
-    30: {'char': '音', 'pinyin': 'yīn', 'meaning': 'звук', 'gif': None, 'audio': None},
-    31: {'char': '面', 'pinyin': 'miàn', 'meaning': 'лицо, мука', 'gif': None, 'audio': None},
-    32: {'char': '见', 'pinyin': 'jiàn', 'meaning': 'видеться', 'gif': None, 'audio': None},
-    33: {'char': '耳', 'pinyin': 'ěr', 'meaning': 'ухо', 'gif': None, 'audio': None},
-    34: {'char': '页', 'pinyin': 'yè', 'meaning': 'страница', 'gif': None, 'audio': None},
-    35: {'char': '牙', 'pinyin': 'yá', 'meaning': 'зуб', 'gif': None, 'audio': None},
-    36: {'char': '文', 'pinyin': 'wén', 'meaning': 'письмена', 'gif': None, 'audio': None},
-    37: {'char': '比', 'pinyin': 'bǐ', 'meaning': 'сравнивать', 'gif': None, 'audio': None},
-    38: {'char': '长', 'pinyin': 'cháng/zhǎng', 'meaning': 'длинный / расти', 'gif': None, 'audio': None},
-    39: {'char': '身', 'pinyin': 'shēn', 'meaning': 'тело', 'gif': None, 'audio': None},
-    40: {'char': '西', 'pinyin': 'xī', 'meaning': 'запад', 'gif': None, 'audio': None},
-    41: {'char': '东', 'pinyin': 'dōng', 'meaning': 'восток', 'gif': None, 'audio': None},
-    42: {'char': '雨', 'pinyin': 'yǔ', 'meaning': 'дождь', 'gif': None, 'audio': None},
-    43: {'char': '气', 'pinyin': 'qì', 'meaning': 'воздух', 'gif': None, 'audio': None},
-    44: {'char': '山', 'pinyin': 'shān', 'meaning': 'гора', 'gif': None, 'audio': None},
-    45: {'char': '士', 'pinyin': 'shì', 'meaning': 'воин', 'gif': None, 'audio': None},
-    46: {'char': '川', 'pinyin': 'chuān', 'meaning': 'поток', 'gif': None, 'audio': None},
-    47: {'char': '生', 'pinyin': 'shēng', 'meaning': 'рождаться', 'gif': None, 'audio': None},
-    48: {'char': '禾', 'pinyin': 'hé', 'meaning': 'злак', 'gif': None, 'audio': None},
-    49: {'char': '贝', 'pinyin': 'bèi', 'meaning': 'раковина, деньги', 'gif': None, 'audio': None},
-    50: {'char': '玉', 'pinyin': 'yù', 'meaning': 'яшма', 'gif': None, 'audio': None},
-    51: {'char': '金', 'pinyin': 'jīn', 'meaning': 'золото, металл', 'gif': None, 'audio': None},
-    52: {'char': '皮', 'pinyin': 'pí', 'meaning': 'кожа', 'gif': None, 'audio': None},
-    53: {'char': '风', 'pinyin': 'fēng', 'meaning': 'ветер', 'gif': None, 'audio': None},
-    54: {'char': '牛', 'pinyin': 'niú', 'meaning': 'корова', 'gif': None, 'audio': None},
-    55: {'char': '羊', 'pinyin': 'yáng', 'meaning': 'баран', 'gif': None, 'audio': None},
-    56: {'char': '鱼', 'pinyin': 'yú', 'meaning': 'рыба', 'gif': None, 'audio': None},
-    57: {'char': '肉', 'pinyin': 'ròu', 'meaning': 'мясо', 'gif': None, 'audio': None},
-    58: {'char': '白', 'pinyin': 'bái', 'meaning': 'белый', 'gif': None, 'audio': None},
-    59: {'char': '黑', 'pinyin': 'hēi', 'meaning': 'чёрный', 'gif': None, 'audio': None},
-    60: {'char': '黄', 'pinyin': 'huáng', 'meaning': 'жёлтый', 'gif': None, 'audio': None},
-    61: {'char': '小', 'pinyin': 'xiǎo', 'meaning': 'маленький', 'gif': None, 'audio': None},
-    62: {'char': '高', 'pinyin': 'gāo', 'meaning': 'высокий', 'gif': None, 'audio': None},
-    63: {'char': '户', 'pinyin': 'hù', 'meaning': 'двор', 'gif': None, 'audio': None},
-    64: {'char': '食', 'pinyin': 'shí', 'meaning': 'еда', 'gif': None, 'audio': None},
-    65: {'char': '衣', 'pinyin': 'yī', 'meaning': 'одежда', 'gif': None, 'audio': None},
-    66: {'char': '工', 'pinyin': 'gōng', 'meaning': 'работа', 'gif': None, 'audio': None},
-    67: {'char': '片', 'pinyin': 'piàn', 'meaning': 'доска', 'gif': None, 'audio': None},
-    68: {'char': '方', 'pinyin': 'fāng', 'meaning': 'квадрат', 'gif': None, 'audio': None},
-    69: {'char': '网', 'pinyin': 'wǎng', 'meaning': 'сеть', 'gif': None, 'audio': None},
-    70: {'char': '飞', 'pinyin': 'fēi', 'meaning': 'летать', 'gif': None, 'audio': None},
-    71: {'char': '车', 'pinyin': 'chē', 'meaning': 'машина', 'gif': None, 'audio': None},
+    1: {'char': '人', 'pinyin': 'rén', 'meaning': 'человек', 'gif': None, 'voice': None},
+    2: {'char': '大', 'pinyin': 'dà', 'meaning': 'большой', 'gif': None, 'voice': None},
+    3: {'char': '天', 'pinyin': 'tiān', 'meaning': 'небо', 'gif': None, 'voice': None},
+    4: {'char': '口', 'pinyin': 'kǒu', 'meaning': 'рот', 'gif': None, 'voice': None},
+    5: {'char': '日', 'pinyin': 'rì', 'meaning': 'солнце', 'gif': None, 'voice': None},
+    6: {'char': '目', 'pinyin': 'mù', 'meaning': 'глаз', 'gif': None, 'voice': None},
+    7: {'char': '田', 'pinyin': 'tián', 'meaning': 'поле', 'gif': None, 'voice': None},
+    8: {'char': '月', 'pinyin': 'yuè', 'meaning': 'месяц', 'gif': None, 'voice': None},
+    9: {'char': '木', 'pinyin': 'mù', 'meaning': 'дерево', 'gif': None, 'voice': None},
+    10: {'char': '女', 'pinyin': 'nǚ', 'meaning': 'женщина', 'gif': None, 'voice': None},
+    11: {'char': '马', 'pinyin': 'mǎ', 'meaning': 'лошадь', 'gif': None, 'voice': None},
+    12: {'char': '儿', 'pinyin': 'ér', 'meaning': 'идущий человек', 'gif': None, 'voice': None},
+    13: {'char': '父', 'pinyin': 'fù', 'meaning': 'отец', 'gif': None, 'voice': None},
+    14: {'char': '母', 'pinyin': 'mǔ', 'meaning': 'мать', 'gif': None, 'voice': None},
+    15: {'char': '门', 'pinyin': 'mén', 'meaning': 'дверь', 'gif': None, 'voice': None},
+    16: {'char': '刀', 'pinyin': 'dāo', 'meaning': 'нож', 'gif': None, 'voice': None},
+    17: {'char': 'ヒ', 'pinyin': 'bǐ', 'meaning': 'черпак, кинжал', 'gif': None, 'voice': None},
+    18: {'char': '米', 'pinyin': 'mǐ', 'meaning': 'рис', 'gif': None, 'voice': None},
+    19: {'char': '水', 'pinyin': 'shuǐ', 'meaning': 'вода', 'gif': None, 'voice': None},
+    20: {'char': '火', 'pinyin': 'huǒ', 'meaning': 'огонь', 'gif': None, 'voice': None},
+    21: {'char': '毛', 'pinyin': 'máo', 'meaning': 'шерсть', 'gif': None, 'voice': None},
+    22: {'char': '手', 'pinyin': 'shǒu', 'meaning': 'рука', 'gif': None, 'voice': None},
+    23: {'char': '又', 'pinyin': 'yòu', 'meaning': 'ладонь правой руки', 'gif': None, 'voice': None},
+    24: {'char': '足', 'pinyin': 'zú', 'meaning': 'нога, ступня', 'gif': None, 'voice': None},
+    25: {'char': '走', 'pinyin': 'zǒu', 'meaning': 'идти', 'gif': None, 'voice': None},
+    26: {'char': '行', 'pinyin': 'xíng', 'meaning': 'движение', 'gif': None, 'voice': None},
+    27: {'char': '舌', 'pinyin': 'shé', 'meaning': 'язык', 'gif': None, 'voice': None},
+    28: {'char': '言', 'pinyin': 'yán', 'meaning': 'речь', 'gif': None, 'voice': None},
+    29: {'char': '立', 'pinyin': 'lì', 'meaning': 'стоять', 'gif': None, 'voice': None},
+    30: {'char': '音', 'pinyin': 'yīn', 'meaning': 'звук', 'gif': None, 'voice': None},
+    31: {'char': '面', 'pinyin': 'miàn', 'meaning': 'лицо, мука', 'gif': None, 'voice': None},
+    32: {'char': '见', 'pinyin': 'jiàn', 'meaning': 'видеться', 'gif': None, 'voice': None},
+    33: {'char': '耳', 'pinyin': 'ěr', 'meaning': 'ухо', 'gif': None, 'voice': None},
+    34: {'char': '页', 'pinyin': 'yè', 'meaning': 'страница', 'gif': None, 'voice': None},
+    35: {'char': '牙', 'pinyin': 'yá', 'meaning': 'зуб', 'gif': None, 'voice': None},
+    36: {'char': '文', 'pinyin': 'wén', 'meaning': 'письмена', 'gif': None, 'voice': None},
+    37: {'char': '比', 'pinyin': 'bǐ', 'meaning': 'сравнивать', 'gif': None, 'voice': None},
+    38: {'char': '长', 'pinyin': 'cháng/zhǎng', 'meaning': 'длинный / расти', 'gif': None, 'voice': None},
+    39: {'char': '身', 'pinyin': 'shēn', 'meaning': 'тело', 'gif': None, 'voice': None},
+    40: {'char': '西', 'pinyin': 'xī', 'meaning': 'запад', 'gif': None, 'voice': None},
+    41: {'char': '东', 'pinyin': 'dōng', 'meaning': 'восток', 'gif': None, 'voice': None},
+    42: {'char': '雨', 'pinyin': 'yǔ', 'meaning': 'дождь', 'gif': None, 'voice': None},
+    43: {'char': '气', 'pinyin': 'qì', 'meaning': 'воздух', 'gif': None, 'voice': None},
+    44: {'char': '山', 'pinyin': 'shān', 'meaning': 'гора', 'gif': None, 'voice': None},
+    45: {'char': '士', 'pinyin': 'shì', 'meaning': 'воин', 'gif': None, 'voice': None},
+    46: {'char': '川', 'pinyin': 'chuān', 'meaning': 'поток', 'gif': None, 'voice': None},
+    47: {'char': '生', 'pinyin': 'shēng', 'meaning': 'рождаться', 'gif': None, 'voice': None},
+    48: {'char': '禾', 'pinyin': 'hé', 'meaning': 'злак', 'gif': None, 'voice': None},
+    49: {'char': '贝', 'pinyin': 'bèi', 'meaning': 'раковина, деньги', 'gif': None, 'voice': None},
+    50: {'char': '玉', 'pinyin': 'yù', 'meaning': 'яшма', 'gif': None, 'voice': None},
+    51: {'char': '金', 'pinyin': 'jīn', 'meaning': 'золото, металл', 'gif': None, 'voice': None},
+    52: {'char': '皮', 'pinyin': 'pí', 'meaning': 'кожа', 'gif': None, 'voice': None},
+    53: {'char': '风', 'pinyin': 'fēng', 'meaning': 'ветер', 'gif': None, 'voice': None},
+    54: {'char': '牛', 'pinyin': 'niú', 'meaning': 'корова', 'gif': None, 'voice': None},
+    55: {'char': '羊', 'pinyin': 'yáng', 'meaning': 'баран', 'gif': None, 'voice': None},
+    56: {'char': '鱼', 'pinyin': 'yú', 'meaning': 'рыба', 'gif': None, 'voice': None},
+    57: {'char': '肉', 'pinyin': 'ròu', 'meaning': 'мясо', 'gif': None, 'voice': None},
+    58: {'char': '白', 'pinyin': 'bái', 'meaning': 'белый', 'gif': None, 'voice': None},
+    59: {'char': '黑', 'pinyin': 'hēi', 'meaning': 'чёрный', 'gif': None, 'voice': None},
+    60: {'char': '黄', 'pinyin': 'huáng', 'meaning': 'жёлтый', 'gif': None, 'voice': None},
+    61: {'char': '小', 'pinyin': 'xiǎo', 'meaning': 'маленький', 'gif': None, 'voice': None},
+    62: {'char': '高', 'pinyin': 'gāo', 'meaning': 'высокий', 'gif': None, 'voice': None},
+    63: {'char': '户', 'pinyin': 'hù', 'meaning': 'двор', 'gif': None, 'voice': None},
+    64: {'char': '食', 'pinyin': 'shí', 'meaning': 'еда', 'gif': None, 'voice': None},
+    65: {'char': '衣', 'pinyin': 'yī', 'meaning': 'одежда', 'gif': None, 'voice': None},
+    66: {'char': '工', 'pinyin': 'gōng', 'meaning': 'работа', 'gif': None, 'voice': None},
+    67: {'char': '片', 'pinyin': 'piàn', 'meaning': 'доска', 'gif': None, 'voice': None},
+    68: {'char': '方', 'pinyin': 'fāng', 'meaning': 'квадрат', 'gif': None, 'voice': None},
+    69: {'char': '网', 'pinyin': 'wǎng', 'meaning': 'сеть', 'gif': None, 'voice': None},
+    70: {'char': '飞', 'pinyin': 'fēi', 'meaning': 'летать', 'gif': None, 'voice': None},
+    71: {'char': '车', 'pinyin': 'chē', 'meaning': 'машина', 'gif': None, 'voice': None},
 }
 
 # Распределение по дням: день 1: id 1-10, день 2: 11-20, …, день 7: 61-71
@@ -140,7 +140,7 @@ def default_state():
         'total_tested': 0,
         'current_new_graphemes': [],
         'current_new_index': 0,
-        'test_questions': [],          # список (gid, correct_meaning) – только перевод!
+        'test_questions': [],
         'test_index': 0,
         'test_correct': 0,
         'test_wrong': [],
@@ -239,7 +239,6 @@ async def send_next_grapheme(user_id, day_num, msg_to_del=None):
         return
     gid = state['current_new_graphemes'][state['current_new_index']]
     g = get_grapheme(gid)
-    # В КАРТОЧКЕ ИЗУЧЕНИЯ ПОКАЗЫВАЕМ ПИНЬИНЬ И ПЕРЕВОД
     text = f"Иероглиф: {g['char']}\nПиньинь: {g['pinyin']}\nЗначение: {g['meaning']}"
     if g['gif']:
         await bot.send_animation(user_id, g['gif'], caption=text,
@@ -317,7 +316,7 @@ async def next_day(callback_query: types.CallbackQuery):
     await show_day_menu(user_id, callback_query.message)
     await bot.answer_callback_query(callback_query.id)
 
-# ---------- ТЕСТ ДНЯ (только перевод на русском) ----------
+# ---------- ТЕСТ ДНЯ ----------
 @dp.callback_query_handler(lambda c: c.data.startswith('test_day_'))
 async def test_day(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
@@ -330,7 +329,6 @@ async def test_day(callback_query: types.CallbackQuery):
     if not test_ids:
         await bot.answer_callback_query(callback_query.id, "Сначала выучите иероглифы этого дня!")
         return
-    # ВОПРОСЫ: (gid, correct_meaning) – только перевод
     questions = [(gid, graphemes[gid]['meaning']) for gid in test_ids]
     random.shuffle(questions)
     state['test_questions'] = questions
@@ -342,7 +340,7 @@ async def test_day(callback_query: types.CallbackQuery):
     await send_test_question(user_id, callback_query.message)
     await bot.answer_callback_query(callback_query.id)
 
-# ---------- ФИНАЛЬНЫЙ ТЕСТ (все 71, только перевод) ----------
+# ---------- ФИНАЛЬНЫЙ ТЕСТ ----------
 @dp.callback_query_handler(lambda c: c.data == 'final_test')
 async def final_test(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
@@ -403,14 +401,12 @@ async def send_test_question(user_id, msg_to_del=None):
         return
     gid, correct_meaning = state['test_questions'][idx]
     g = graphemes[gid]
-    # ГЕНЕРИРУЕМ 3 ВАРИАНТА ПЕРЕВОДА (без пиньиня)
     other_meanings = [v['meaning'] for k, v in graphemes.items() if k != gid]
     random.shuffle(other_meanings)
     options = [correct_meaning] + other_meanings[:2]
     random.shuffle(options)
     state['test_options'] = options
     state['test_correct_option'] = correct_meaning
-    # ВОПРОС: только GIF иероглифа, без пиньиня и перевода
     caption = f"❓ Вопрос {idx+1} из {total}: Что означает этот иероглиф?"
     if g['gif']:
         await bot.send_animation(user_id, g['gif'], caption=caption,
@@ -488,13 +484,13 @@ async def game_over(callback_query: types.CallbackQuery):
     )
     await bot.answer_callback_query(callback_query.id)
 
-# ---------- ОЗВУЧИВАНИЕ ----------
+# ---------- ОЗВУЧИВАНИЕ (с ключом 'voice') ----------
 @dp.callback_query_handler(lambda c: c.data.startswith('voice_'))
 async def voice_handler(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     gid = int(callback_query.data.split('_')[1])
     g = get_grapheme(gid)
-    if not g or not g['audio']:
+    if not g or not g.get('voice'):
         await bot.answer_callback_query(callback_query.id, "Аудио пока нет")
         return
     voice_state = load_voice_state()
@@ -504,20 +500,21 @@ async def voice_handler(callback_query: types.CallbackQuery):
             await bot.delete_message(user_id, int(old_msg_id))
         except:
             pass
-    msg = await bot.send_voice(user_id, g['audio'])
+    msg = await bot.send_voice(user_id, g['voice'])
     voice_state[str(user_id)] = msg.message_id
     save_voice_state(voice_state)
     await bot.answer_callback_query(callback_query.id)
 
-# ВРЕМЕННЫЙ ОБРАБОТЧИК ДЛЯ ПОЛУЧЕНИЯ FILE_ID
-@dp.message_handler(content_types=['animation', 'voice'])
-async def get_file_id_handler(message: types.Message):
-    if message.animation:
-        file_id = message.animation.file_id
-        await message.reply(f"GIF file_id:\n`{file_id}`")
-    elif message.voice:
-        file_id = message.voice.file_id
-        await message.reply(f"Voice file_id:\n`{file_id}`")
+# ---------- ВРЕМЕННЫЙ ОБРАБОТЧИК ДЛЯ ПОЛУЧЕНИЯ FILE_ID ----------
+# Раскомментируйте для получения file_id GIF и голосовых
+# @dp.message_handler(content_types=['animation', 'voice'])
+# async def get_file_id_handler(message: types.Message):
+#     if message.animation:
+#         file_id = message.animation.file_id
+#         await message.reply(f"GIF file_id:\n`{file_id}`")
+#     elif message.voice:
+#         file_id = message.voice.file_id
+#         await message.reply(f"Voice file_id:\n`{file_id}`")
 
 # ---------- ЗАПУСК ----------
 async def on_startup(dp):
