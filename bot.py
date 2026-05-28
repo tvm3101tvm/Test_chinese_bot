@@ -9,7 +9,7 @@ from aiogram.utils import executor
 from config import BOT_TOKEN
 from keyboards import (
     main_menu, day_menu, finish_study_keyboard, grapheme_card_keyboard,
-    test_keyboard, end_game_keyboard
+    repeat_grapheme_card_keyboard, test_keyboard, end_game_keyboard
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -18,7 +18,7 @@ dp = Dispatcher(bot)
 dp.middleware.setup(LoggingMiddleware())
 
 # ======================= БАЗА ГРАФЕМ (71 иероглиф) =======================
-# Все file_id должны быть в кавычках (одинарных или двойных)
+# Все file_id реальные (часть получена, остальные будут заменены по мере получения)
 graphemes = {
     1: {'char': '人', 'pinyin': 'rén', 'meaning': 'человек', 'gif': 'CgACAgIAAyEFAATUCKVhAANNahcBZ9qEao7mbO2hwxYc5JszZkAAAoGdAAIEQLhI1OsNgdeZp-o7BA', 'voice': 'CQACAgIAAyEFAATUCKVhAANrahczev-uCAo8Q5l02mjOmT_mFowAAqmnAAKPt7hIoqyCsgABcUqGOwQ'},
     2: {'char': '大', 'pinyin': 'dà', 'meaning': 'большой', 'gif': 'CgACAgIAAyEFAATUCKVhAANOahcCF1X17Sdi-XmQ8k2Zb_6kjjgAAoadAAIEQLhIf34J0DpiPXA7BA', 'voice': 'CQACAgIAAyEFAATUCKVhAANsahczeqfnNDXqcTBWa6PVrM31F30AApunAAKPt7hIM3MLp5yn6Yc7BA'},
@@ -138,8 +138,11 @@ def default_state():
         'studied': [],
         'score': 0,
         'total_tested': 0,
+        'last_test_result': None,
         'current_new_graphemes': [],
         'current_new_index': 0,
+        'repeat_graphemes': [],
+        'repeat_index': 0,
         'test_questions': [],
         'test_index': 0,
         'test_correct': 0,
@@ -147,25 +150,53 @@ def default_state():
         'test_options': [],
         'test_correct_option': '',
         'waiting_test': False,
-        'final_test_done': False
+        'current_test_is_final': False
     }
 
 def get_grapheme(gid):
     return graphemes.get(gid)
 
-# ======================= ОБРАБОТЧИКИ КОМАНД =======================
+# ======================= УСТАНОВКА КОМАНД =======================
+async def set_commands(bot: Bot):
+    commands = [
+        types.BotCommand(command="start", description="Начать игру"),
+        types.BotCommand(command="help", description="Помощь и инструкция")
+    ]
+    await bot.set_my_commands(commands)
+
+# ======================= ОБРАБОТЧИКИ =======================
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message):
     await message.answer(
         "🇨🇳 Добро пожаловать в «Китайский квест»!\n"
         "Вы студент, готовитесь к HSK. У вас 7 дней.\n"
-        "Каждый день изучайте 10–11 новых иероглифов (GIF написания + пиньинь + перевод).\n"
-        "После изучения дня можно пройти тест только по этим иероглифам.\n"
-        "В любой момент доступен финальный тест по всем 71 иероглифу.\n\n"
-        "В тесте показывается GIF иероглифа, а варианты ответа — переводы на русский язык.\n\n"
+        "Каждый день изучайте 10–11 новых иероглифов.\n"
+        "После изучения дня можно пройти тест или повторить иероглифы.\n"
+        "Тесты можно проходить сколько угодно раз – результаты суммируются.\n"
+        "Используйте /help для инструкции.\n\n"
         "Нажмите кнопку, чтобы начать!",
         reply_markup=main_menu()
     )
+
+@dp.message_handler(commands=['help'])
+async def cmd_help(message: types.Message):
+    help_text = (
+        "📚 *Инструкция по использованию бота «Китайский квест»*\n\n"
+        "1️⃣ *Начало игры*: нажмите «Начать новый квест» или введите /start.\n"
+        "2️⃣ *Изучение*: в каждый из 7 дней вы будете учить 10-11 новых иероглифов.\n"
+        "   После каждого иероглифа нажмите «Следующий».\n"
+        "3️⃣ *Повторение*: после изучения всех иероглифов дня вы можете повторно просмотреть их,\n"
+        "   нажав «Повторить иероглифы дня».\n"
+        "4️⃣ *Тесты*:\n"
+        "   - Тест дня можно проходить в любой момент (кнопка в меню дня).\n"
+        "   - Финальный тест (71 иероглиф) доступен на 7-й день.\n"
+        "   - Результаты тестов суммируются, а последний результат сохраняется.\n"
+        "5️⃣ *Последний тест*: нажмите «📊 Последний тест» в главном меню,\n"
+        "   чтобы увидеть результат самого свежего теста.\n"
+        "6️⃣ *Завершение*: после 7-го дня завершите игру кнопкой «Завершить игру».\n\n"
+        "Удачи в изучении китайского! 🇨🇳"
+    )
+    await message.reply(help_text, parse_mode="Markdown")
 
 @dp.callback_query_handler(lambda c: c.data == 'new_game')
 async def new_game(callback_query: types.CallbackQuery):
@@ -178,9 +209,28 @@ async def new_game(callback_query: types.CallbackQuery):
         state['studied'] = saved.get('studied', [])
         state['score'] = saved.get('score', 0)
         state['total_tested'] = saved.get('total_tested', 0)
-        state['final_test_done'] = saved.get('final_test_done', False)
+        state['last_test_result'] = saved.get('last_test_result', None)
     user_states[user_id] = state
     await show_day_menu(user_id, callback_query.message)
+    await bot.answer_callback_query(callback_query.id)
+
+@dp.callback_query_handler(lambda c: c.data == 'last_test')
+async def show_last_test(callback_query: types.CallbackQuery):
+    user_id = callback_query.from_user.id
+    state = user_states.get(user_id)
+    if not state:
+        await bot.answer_callback_query(callback_query.id, "Сначала начните игру (/start)")
+        return
+    if state['last_test_result']:
+        correct, total = state['last_test_result']
+        percent = (correct / total * 100) if total > 0 else 0
+        await bot.send_message(user_id,
+                               f"📊 *Ваш последний тест:* {correct} из {total} правильных ({percent:.1f}%).\n"
+                               "Результаты предыдущих тестов суммируются в общую статистику.\n"
+                               "Сыграйте ещё, чтобы улучшить результат!",
+                               parse_mode="Markdown")
+    else:
+        await bot.send_message(user_id, "Вы ещё не проходили ни одного теста. Пройдите тест дня или финальный тест!")
     await bot.answer_callback_query(callback_query.id)
 
 async def show_day_menu(user_id, message_to_edit=None):
@@ -192,8 +242,7 @@ async def show_day_menu(user_id, message_to_edit=None):
     unstudied = [gid for gid in day_ids if gid not in state['studied']]
     has_unstudied = len(unstudied) > 0
     has_day_graphemes = len(day_ids) > 0
-    final_test_available = (day == 7 and not state['final_test_done']) or (day > 7)
-    kb = day_menu(day, has_unstudied, has_day_graphemes, final_test_available)
+    kb = day_menu(day, has_unstudied, has_day_graphemes)
     text = f"День {day} из 7. Выберите действие:"
     if message_to_edit:
         await bot.edit_message_text(text, user_id, message_to_edit.message_id, reply_markup=kb)
@@ -217,42 +266,55 @@ async def study_day(callback_query: types.CallbackQuery):
         return
     state['current_new_graphemes'] = new_ids
     state['current_new_index'] = 0
-    await send_next_grapheme(user_id, day_num, callback_query.message)
+    await send_next_grapheme(user_id, day_num, callback_query.message, mode='study')
     await bot.answer_callback_query(callback_query.id)
 
-async def send_next_grapheme(user_id, day_num, msg_to_del=None):
+async def send_next_grapheme(user_id, day_num, msg_to_del=None, mode='study'):
     state = user_states.get(user_id)
     if not state:
         return
-    if state['current_new_index'] >= len(state['current_new_graphemes']):
-        total_new = len(state['current_new_graphemes'])
-        await bot.send_message(
-            user_id,
-            f"Вы изучили все новые иероглифы дня {day_num}!",
-            reply_markup=finish_study_keyboard(day_num, total_new)
-        )
-        if msg_to_del:
-            try:
+    if mode == 'study':
+        if state['current_new_index'] >= len(state['current_new_graphemes']):
+            total_new = len(state['current_new_graphemes'])
+            await bot.send_message(
+                user_id,
+                f"Вы изучили все новые иероглифы дня {day_num}!",
+                reply_markup=finish_study_keyboard(day_num, total_new)
+            )
+            if msg_to_del:
+                try:
+                    await bot.delete_message(user_id, msg_to_del.message_id)
+                except:
+                    pass
+            return
+        gid = state['current_new_graphemes'][state['current_new_index']]
+    else:  # repeat
+        if state['repeat_index'] >= len(state['repeat_graphemes']):
+            await bot.send_message(user_id, "Повторение завершено. Возвращаемся в меню дня.")
+            await show_day_menu(user_id, None)
+            if msg_to_del:
                 await bot.delete_message(user_id, msg_to_del.message_id)
-            except:
-                pass
-        return
-    gid = state['current_new_graphemes'][state['current_new_index']]
+            return
+        gid = state['repeat_graphemes'][state['repeat_index']]
+
     g = get_grapheme(gid)
     text = f"Иероглиф: {g['char']}\nПиньинь: {g['pinyin']}\nЗначение: {g['meaning']}"
-    if g['gif']:
-        await bot.send_animation(user_id, g['gif'], caption=text,
-                                 reply_markup=grapheme_card_keyboard(gid, day_num))
+    if mode == 'study':
+        kb = grapheme_card_keyboard(gid, day_num, mode='study')
     else:
-        await bot.send_message(user_id, text, reply_markup=grapheme_card_keyboard(gid, day_num))
+        kb = repeat_grapheme_card_keyboard(gid, day_num)
+    if g['gif']:
+        await bot.send_animation(user_id, g['gif'], caption=text, reply_markup=kb)
+    else:
+        await bot.send_message(user_id, text, reply_markup=kb)
     if msg_to_del:
         try:
             await bot.delete_message(user_id, msg_to_del.message_id)
         except:
             pass
 
-@dp.callback_query_handler(lambda c: c.data.startswith('next_grapheme_'))
-async def next_grapheme(callback_query: types.CallbackQuery):
+@dp.callback_query_handler(lambda c: c.data.startswith('study_next_'))
+async def study_next_grapheme(callback_query: types.CallbackQuery):
     parts = callback_query.data.split('_')
     day_num = int(parts[2])
     gid = int(parts[3])
@@ -268,11 +330,49 @@ async def next_grapheme(callback_query: types.CallbackQuery):
             'studied': state['studied'],
             'score': state['score'],
             'total_tested': state['total_tested'],
-            'final_test_done': state['final_test_done']
+            'last_test_result': state['last_test_result']
         }
         save_progress(all_prog)
     state['current_new_index'] += 1
-    await send_next_grapheme(user_id, day_num, callback_query.message)
+    await send_next_grapheme(user_id, day_num, callback_query.message, mode='study')
+    await bot.answer_callback_query(callback_query.id)
+
+# ---------- ПОВТОРЕНИЕ ИЕРОГЛИФОВ ДНЯ ----------
+@dp.callback_query_handler(lambda c: c.data.startswith('repeat_day_'))
+async def repeat_day(callback_query: types.CallbackQuery):
+    user_id = callback_query.from_user.id
+    day_num = int(callback_query.data.split('_')[2])
+    state = user_states.get(user_id)
+    if not state or state['day'] != day_num:
+        await bot.answer_callback_query(callback_query.id, "Ошибка")
+        return
+    day_ids = day_to_ids[day_num]
+    state['repeat_graphemes'] = day_ids.copy()
+    state['repeat_index'] = 0
+    await send_next_grapheme(user_id, day_num, callback_query.message, mode='repeat')
+    await bot.answer_callback_query(callback_query.id)
+
+@dp.callback_query_handler(lambda c: c.data.startswith('repeat_next_'))
+async def repeat_next_grapheme(callback_query: types.CallbackQuery):
+    parts = callback_query.data.split('_')
+    day_num = int(parts[2])
+    user_id = callback_query.from_user.id
+    state = user_states.get(user_id)
+    if not state or state['day'] != day_num:
+        return
+    state['repeat_index'] += 1
+    await send_next_grapheme(user_id, day_num, callback_query.message, mode='repeat')
+    await bot.answer_callback_query(callback_query.id)
+
+@dp.callback_query_handler(lambda c: c.data.startswith('end_repeat_'))
+async def end_repeat(callback_query: types.CallbackQuery):
+    user_id = callback_query.from_user.id
+    day_num = int(callback_query.data.split('_')[2])
+    state = user_states.get(user_id)
+    if state:
+        state['repeat_graphemes'] = []
+        state['repeat_index'] = 0
+    await show_day_menu(user_id, callback_query.message)
     await bot.answer_callback_query(callback_query.id)
 
 # ---------- ЗАВЕРШЕНИЕ ДНЯ ----------
@@ -310,7 +410,7 @@ async def next_day(callback_query: types.CallbackQuery):
         'studied': state['studied'],
         'score': state['score'],
         'total_tested': state['total_tested'],
-        'final_test_done': state['final_test_done']
+        'last_test_result': state['last_test_result']
     }
     save_progress(all_prog)
     await show_day_menu(user_id, callback_query.message)
@@ -347,9 +447,6 @@ async def final_test(callback_query: types.CallbackQuery):
     state = user_states.get(user_id)
     if not state:
         return
-    if state['final_test_done']:
-        await bot.answer_callback_query(callback_query.id, "Финальный тест уже пройден. Завершите игру.")
-        return
     questions = [(gid, graphemes[gid]['meaning']) for gid in graphemes.keys()]
     random.shuffle(questions)
     state['test_questions'] = questions
@@ -379,17 +476,16 @@ async def send_test_question(user_id, msg_to_del=None):
             out += "\n🎉 Отлично! Ошибок нет!"
         await bot.send_message(user_id, out)
         state['waiting_test'] = False
+        state['last_test_result'] = (correct, total)
         state['total_tested'] += total
         state['score'] += correct
-        if state.get('current_test_is_final'):
-            state['final_test_done'] = True
         all_prog = load_progress()
         all_prog[str(user_id)] = {
             'day': state['day'],
             'studied': state['studied'],
             'score': state['score'],
             'total_tested': state['total_tested'],
-            'final_test_done': state['final_test_done']
+            'last_test_result': state['last_test_result']
         }
         save_progress(all_prog)
         await show_day_menu(user_id, None)
@@ -484,7 +580,7 @@ async def game_over(callback_query: types.CallbackQuery):
     )
     await bot.answer_callback_query(callback_query.id)
 
-# ---------- ОЗВУЧИВАНИЕ (поддержка голосовых) ----------
+# ---------- ОЗВУЧИВАНИЕ ----------
 @dp.callback_query_handler(lambda c: c.data.startswith('voice_'))
 async def voice_handler(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
@@ -509,8 +605,7 @@ async def voice_handler(callback_query: types.CallbackQuery):
     save_voice_state(voice_state)
     await bot.answer_callback_query(callback_query.id)
 
-# ---------- ВРЕМЕННЫЙ ОБРАБОТЧИК ДЛЯ ПОЛУЧЕНИЯ FILE_ID ----------
-
+# ---------- ВРЕМЕННЫЙ ОБРАБОТЧИК ДЛЯ ПОЛУЧЕНИЯ FILE_ID (всегда активен) ----------
 @dp.message_handler(content_types=['animation', 'voice', 'audio'])
 async def get_file_id_handler(message: types.Message):
     if message.animation:
@@ -518,14 +613,15 @@ async def get_file_id_handler(message: types.Message):
         await message.reply(f"GIF file_id:\n`{file_id}`")
     elif message.voice:
         file_id = message.voice.file_id
-        await message.reply(f"Voice message file_id:\n`{file_id}`")
+        await message.reply(f"Voice file_id:\n`{file_id}`")
     elif message.audio:
         file_id = message.audio.file_id
-        await message.reply(f"Audio file (MP3/M4A) file_id:\n`{file_id}`")
+        await message.reply(f"Audio file_id:\n`{file_id}`")
 
 # ---------- ЗАПУСК ----------
 async def on_startup(dp):
     await bot.delete_webhook(drop_pending_updates=True)
+    await set_commands(bot)
     logging.info("Бот запущен")
 
 if __name__ == '__main__':
